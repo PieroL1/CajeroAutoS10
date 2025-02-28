@@ -1,12 +1,11 @@
 package presentacion.vista;
 
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.BorderFactory;
+import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -15,9 +14,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import modelo.Transaccion;
 import presentacion.controlador.CajeroController;
 
 /**
@@ -33,7 +35,9 @@ public class InterfazCajero extends JFrame implements ActionListener {
     private JPanel loginPanel;
     private JPanel menuPanel;
     private JPanel depositoPanel;
+    private JPanel transferenciaPanel;
     private JPanel retiroPanel;
+    private JPanel historialPanel;
     
     // Componentes del panel de login
     private JTextField txtNumeroCuenta;
@@ -44,19 +48,30 @@ public class InterfazCajero extends JFrame implements ActionListener {
     private JLabel lblBienvenida;
     private JButton btnConsultarSaldo;
     private JButton btnDepositar;
+    private JButton btnTransferir;
     private JButton btnRetirar;
+    private JButton btnHistorial;
     private JButton btnSalir;
     
     // Componentes del panel de depósito
-    private JTextField txtNumeroCuentaDestino;
     private JTextField txtMontoDeposito;
     private JButton btnConfirmarDeposito;
     private JButton btnCancelarDeposito;
+    
+    // Componentes del panel de transferencia
+    private JTextField txtNumeroCuentaDestino;
+    private JTextField txtMontoTransferencia;
+    private JButton btnConfirmarTransferencia;
+    private JButton btnCancelarTransferencia;
     
     // Componentes del panel de retiro
     private JTextField txtMontoRetiro;
     private JButton btnConfirmarRetiro;
     private JButton btnCancelarRetiro;
+    
+    // Componentes del panel de historial
+    private JTextArea txtAreaHistorial;
+    private JButton btnVolverHistorial;
     
     public InterfazCajero() {
         controlador = new CajeroController();
@@ -73,12 +88,16 @@ public class InterfazCajero extends JFrame implements ActionListener {
         crearPanelLogin();
         crearPanelMenu();
         crearPanelDeposito();
+        crearPanelTransferencia();
         crearPanelRetiro();
+        crearPanelHistorial();
         
         mainPanel.add(loginPanel, "login");
         mainPanel.add(menuPanel, "menu");
         mainPanel.add(depositoPanel, "deposito");
+        mainPanel.add(transferenciaPanel, "transferencia");
         mainPanel.add(retiroPanel, "retiro");
+        mainPanel.add(historialPanel, "historial");
         
         cardLayout.show(mainPanel, "login");
         
@@ -145,9 +164,17 @@ public class InterfazCajero extends JFrame implements ActionListener {
         btnDepositar.setAlignmentX(CENTER_ALIGNMENT);
         btnDepositar.addActionListener(this);
         
+        btnTransferir = new JButton("Transferir");
+        btnTransferir.setAlignmentX(CENTER_ALIGNMENT);
+        btnTransferir.addActionListener(this);
+        
         btnRetirar = new JButton("Retirar");
         btnRetirar.setAlignmentX(CENTER_ALIGNMENT);
         btnRetirar.addActionListener(this);
+        
+        btnHistorial = new JButton("Historial");
+        btnHistorial.setAlignmentX(CENTER_ALIGNMENT);
+        btnHistorial.addActionListener(this);
         
         btnSalir = new JButton("Cerrar Sesión");
         btnSalir.setAlignmentX(CENTER_ALIGNMENT);
@@ -161,7 +188,11 @@ public class InterfazCajero extends JFrame implements ActionListener {
         menuPanel.add(Box.createVerticalStrut(10));
         menuPanel.add(btnDepositar);
         menuPanel.add(Box.createVerticalStrut(10));
+        menuPanel.add(btnTransferir);
+        menuPanel.add(Box.createVerticalStrut(10));
         menuPanel.add(btnRetirar);
+        menuPanel.add(Box.createVerticalStrut(10));
+        menuPanel.add(btnHistorial);
         menuPanel.add(Box.createVerticalStrut(30));
         menuPanel.add(btnSalir);
     }
@@ -174,13 +205,6 @@ public class InterfazCajero extends JFrame implements ActionListener {
         JLabel lblTitulo = new JLabel("Depósito de Efectivo");
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
         lblTitulo.setAlignmentX(CENTER_ALIGNMENT);
-        
-        JLabel lblCuentaDestino = new JLabel("Número de Cuenta Destino:");
-        lblCuentaDestino.setAlignmentX(CENTER_ALIGNMENT);
-        
-        txtNumeroCuentaDestino = new JTextField(10);
-        txtNumeroCuentaDestino.setMaximumSize(new Dimension(200, 30));
-        txtNumeroCuentaDestino.setAlignmentX(CENTER_ALIGNMENT);
         
         JLabel lblMonto = new JLabel("Ingrese el monto a depositar:");
         lblMonto.setAlignmentX(CENTER_ALIGNMENT);
@@ -199,10 +223,6 @@ public class InterfazCajero extends JFrame implements ActionListener {
         
         depositoPanel.add(lblTitulo);
         depositoPanel.add(Box.createVerticalStrut(30));
-        depositoPanel.add(lblCuentaDestino);
-        depositoPanel.add(Box.createVerticalStrut(5));
-        depositoPanel.add(txtNumeroCuentaDestino);
-        depositoPanel.add(Box.createVerticalStrut(15));
         depositoPanel.add(lblMonto);
         depositoPanel.add(Box.createVerticalStrut(5));
         depositoPanel.add(txtMontoDeposito);
@@ -210,6 +230,52 @@ public class InterfazCajero extends JFrame implements ActionListener {
         depositoPanel.add(btnConfirmarDeposito);
         depositoPanel.add(Box.createVerticalStrut(10));
         depositoPanel.add(btnCancelarDeposito);
+    }
+    
+    private void crearPanelTransferencia() {
+        transferenciaPanel = new JPanel();
+        transferenciaPanel.setLayout(new BoxLayout(transferenciaPanel, BoxLayout.Y_AXIS));
+        transferenciaPanel.setBorder(new EmptyBorder(30, 50, 30, 50));
+        
+        JLabel lblTitulo = new JLabel("Transferencia de Efectivo");
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
+        lblTitulo.setAlignmentX(CENTER_ALIGNMENT);
+        
+        JLabel lblCuentaDestino = new JLabel("Número de Cuenta Destino:");
+        lblCuentaDestino.setAlignmentX(CENTER_ALIGNMENT);
+        
+        txtNumeroCuentaDestino = new JTextField(10);
+        txtNumeroCuentaDestino.setMaximumSize(new Dimension(200, 30));
+        txtNumeroCuentaDestino.setAlignmentX(CENTER_ALIGNMENT);
+        
+        JLabel lblMonto = new JLabel("Ingrese el monto a transferir:");
+        lblMonto.setAlignmentX(CENTER_ALIGNMENT);
+        
+        txtMontoTransferencia = new JTextField(10);
+        txtMontoTransferencia.setMaximumSize(new Dimension(200, 30));
+        txtMontoTransferencia.setAlignmentX(CENTER_ALIGNMENT);
+        
+        btnConfirmarTransferencia = new JButton("Confirmar");
+        btnConfirmarTransferencia.setAlignmentX(CENTER_ALIGNMENT);
+        btnConfirmarTransferencia.addActionListener(this);
+        
+        btnCancelarTransferencia = new JButton("Cancelar");
+        btnCancelarTransferencia.setAlignmentX(CENTER_ALIGNMENT);
+        btnCancelarTransferencia.addActionListener(this);
+        
+        transferenciaPanel.add(lblTitulo);
+        transferenciaPanel.add(Box.createVerticalStrut(30));
+        transferenciaPanel.add(lblCuentaDestino);
+        transferenciaPanel.add(Box.createVerticalStrut(5));
+        transferenciaPanel.add(txtNumeroCuentaDestino);
+        transferenciaPanel.add(Box.createVerticalStrut(15));
+        transferenciaPanel.add(lblMonto);
+        transferenciaPanel.add(Box.createVerticalStrut(5));
+        transferenciaPanel.add(txtMontoTransferencia);
+        transferenciaPanel.add(Box.createVerticalStrut(25));
+        transferenciaPanel.add(btnConfirmarTransferencia);
+        transferenciaPanel.add(Box.createVerticalStrut(10));
+        transferenciaPanel.add(btnCancelarTransferencia);
     }
     
     private void crearPanelRetiro() {
@@ -245,6 +311,30 @@ public class InterfazCajero extends JFrame implements ActionListener {
         retiroPanel.add(btnConfirmarRetiro);
         retiroPanel.add(Box.createVerticalStrut(10));
         retiroPanel.add(btnCancelarRetiro);
+    }
+    
+    private void crearPanelHistorial() {
+        historialPanel = new JPanel();
+        historialPanel.setLayout(new BoxLayout(historialPanel, BoxLayout.Y_AXIS));
+        historialPanel.setBorder(new EmptyBorder(30, 50, 30, 50));
+        
+        JLabel lblTitulo = new JLabel("Historial de Transacciones");
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
+        lblTitulo.setAlignmentX(CENTER_ALIGNMENT);
+        
+        txtAreaHistorial = new JTextArea(15, 40);
+        txtAreaHistorial.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(txtAreaHistorial);
+        
+        btnVolverHistorial = new JButton("Volver");
+        btnVolverHistorial.setAlignmentX(CENTER_ALIGNMENT);
+        btnVolverHistorial.addActionListener(this);
+        
+        historialPanel.add(lblTitulo);
+        historialPanel.add(Box.createVerticalStrut(20));
+        historialPanel.add(scrollPane);
+        historialPanel.add(Box.createVerticalStrut(20));
+        historialPanel.add(btnVolverHistorial);
     }
     
     @Override
@@ -294,12 +384,35 @@ public class InterfazCajero extends JFrame implements ActionListener {
         }
         else if (source == btnDepositar) {
             txtMontoDeposito.setText("");
-            txtNumeroCuentaDestino.setText("");
             cardLayout.show(mainPanel, "deposito");
+        }
+        else if (source == btnTransferir) {
+            txtMontoTransferencia.setText("");
+            txtNumeroCuentaDestino.setText("");
+            cardLayout.show(mainPanel, "transferencia");
         }
         else if (source == btnRetirar) {
             txtMontoRetiro.setText("");
             cardLayout.show(mainPanel, "retiro");
+        }
+        else if (source == btnHistorial) {
+            List<Transaccion> transacciones = controlador.obtenerHistorialTransacciones();
+            if (transacciones != null) {
+                StringBuilder historial = new StringBuilder();
+                for (Transaccion transaccion : transacciones) {
+                    historial.append(transaccion.getFecha()).append(" - ")
+                             .append(transaccion.getTipo()).append(" - $")
+                             .append(transaccion.getMonto()).append(" - Saldo: $")
+                             .append(transaccion.getSaldoDespues()).append("\n");
+                }
+                txtAreaHistorial.setText(historial.toString());
+                cardLayout.show(mainPanel, "historial");
+            } else {
+                JOptionPane.showMessageDialog(this, 
+                        "No se pudo obtener el historial de transacciones", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
         else if (source == btnSalir) {
             controlador.cerrarSesion();
@@ -312,6 +425,44 @@ public class InterfazCajero extends JFrame implements ActionListener {
         else if (source == btnConfirmarDeposito) {
             try {
                 double monto = Double.parseDouble(txtMontoDeposito.getText());
+                
+                if (monto <= 0) {
+                    JOptionPane.showMessageDialog(this, 
+                            "El monto debe ser mayor a cero", 
+                            "Error de validación", 
+                            JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                boolean depositoExitoso = controlador.realizarDeposito(monto);
+                if (depositoExitoso) {
+                    JOptionPane.showMessageDialog(this, 
+                            "Depósito realizado con éxito\nNuevo saldo: $" + 
+                                    String.format("%.2f", controlador.consultarSaldo()), 
+                            "Depósito Exitoso", 
+                            JOptionPane.INFORMATION_MESSAGE);
+                    cardLayout.show(mainPanel, "menu");
+                } else {
+                    JOptionPane.showMessageDialog(this, 
+                            "Error al realizar el depósito", 
+                            "Error", 
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, 
+                        "Por favor, ingrese un monto válido", 
+                        "Error de formato", 
+                        JOptionPane.WARNING_MESSAGE);
+            }
+        }
+        else if (source == btnCancelarDeposito) {
+            cardLayout.show(mainPanel, "menu");
+        }
+        
+        // Manejo de eventos del panel de transferencia
+        else if (source == btnConfirmarTransferencia) {
+            try {
+                double monto = Double.parseDouble(txtMontoTransferencia.getText());
                 String numeroCuentaDestino = txtNumeroCuentaDestino.getText();
                 
                 if (numeroCuentaDestino.isEmpty()) {
@@ -330,16 +481,16 @@ public class InterfazCajero extends JFrame implements ActionListener {
                     return;
                 }
                 
-                boolean depositoExitoso = controlador.realizarDeposito(numeroCuentaDestino, monto);
-                if (depositoExitoso) {
+                boolean transferenciaExitosa = controlador.realizarTransferencia(numeroCuentaDestino, monto);
+                if (transferenciaExitosa) {
                     JOptionPane.showMessageDialog(this, 
-                            "Depósito realizado con éxito", 
-                            "Depósito Exitoso", 
+                            "Transferencia realizada con éxito", 
+                            "Transferencia Exitosa", 
                             JOptionPane.INFORMATION_MESSAGE);
                     cardLayout.show(mainPanel, "menu");
                 } else {
                     JOptionPane.showMessageDialog(this, 
-                            "Error al realizar el depósito", 
+                            "Error al realizar la transferencia", 
                             "Error", 
                             JOptionPane.ERROR_MESSAGE);
                 }
@@ -350,7 +501,7 @@ public class InterfazCajero extends JFrame implements ActionListener {
                         JOptionPane.WARNING_MESSAGE);
             }
         }
-        else if (source == btnCancelarDeposito) {
+       else if (source == btnCancelarTransferencia) {
             cardLayout.show(mainPanel, "menu");
         }
         
@@ -388,6 +539,11 @@ public class InterfazCajero extends JFrame implements ActionListener {
             }
         }
         else if (source == btnCancelarRetiro) {
+            cardLayout.show(mainPanel, "menu");
+        }
+        
+        // Manejo de eventos del panel de historial
+        else if (source == btnVolverHistorial) {
             cardLayout.show(mainPanel, "menu");
         }
     }

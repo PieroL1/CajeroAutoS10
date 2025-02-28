@@ -33,6 +33,9 @@ public class CajeroController {
     }
     
     public void cerrarSesion() {
+        if (cuentaActual != null) {
+            cajeroService.generarHistorialTransaccionesPDF(cuentaActual);
+        }
         cuentaActual = null;
     }
     
@@ -43,8 +46,18 @@ public class CajeroController {
         return -1;
     }
     
-    public boolean realizarDeposito(String numeroCuentaDestino, double monto) {
-        return cajeroService.realizarDeposito(numeroCuentaDestino, monto);
+    public boolean realizarDeposito(double monto) {
+        if (cuentaActual != null) {
+            return cajeroService.realizarDeposito(cuentaActual, monto);
+        }
+        return false;
+    }
+
+    public boolean realizarTransferencia(String cuentaDestino, double monto) {
+        if (cuentaActual != null) {
+            return cajeroService.realizarTransferencia(cuentaActual, cuentaDestino, monto);
+        }
+        return false;
     }
     
     public boolean realizarRetiro(double monto) {
@@ -52,6 +65,13 @@ public class CajeroController {
             return cajeroService.realizarRetiro(cuentaActual, monto);
         }
         return false;
+    }
+    
+    public List<Transaccion> obtenerHistorialTransacciones() {
+        if (cuentaActual != null) {
+            return cajeroService.obtenerHistorialTransacciones(cuentaActual);
+        }
+        return null;
     }
     
     public String getCuentaActual() {
