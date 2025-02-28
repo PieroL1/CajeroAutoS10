@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import modelo.Transaccion;
 import presentacion.controlador.CajeroController;
@@ -109,46 +110,66 @@ public class InterfazCajero extends JFrame implements ActionListener {
         add(mainPanel);
     }
     
-    private void crearPanelLogin() {
-        loginPanel = new JPanel();
-        loginPanel.setSize(500, 400);
-        loginPanel.setLayout(new BoxLayout(loginPanel, BoxLayout.Y_AXIS));
-        loginPanel.setBorder(new EmptyBorder(30, 50, 30, 50));
-        
-        JLabel lblTitulo = new JLabel("Bienvenido al Cajero Automático");
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 18));
-        lblTitulo.setAlignmentX(CENTER_ALIGNMENT);
-        
-        JLabel lblCuenta = new JLabel("Número de Cuenta:");
-        lblCuenta.setAlignmentX(CENTER_ALIGNMENT);
-        
-        txtNumeroCuenta = new JTextField(10);
-        txtNumeroCuenta.setMaximumSize(new Dimension(200, 30));
-        txtNumeroCuenta.setAlignmentX(CENTER_ALIGNMENT);
-        
-        JLabel lblClave = new JLabel("Clave:");
-        lblClave.setAlignmentX(CENTER_ALIGNMENT);
-        
-        txtClave = new JPasswordField(10);
-        txtClave.setMaximumSize(new Dimension(200, 30));
-        txtClave.setAlignmentX(CENTER_ALIGNMENT);
-        
-        btnLogin = new JButton("Iniciar Sesión");
-        btnLogin.setAlignmentX(CENTER_ALIGNMENT);
-        btnLogin.addActionListener(this);
-        
-        loginPanel.add(lblTitulo);
-        loginPanel.add(Box.createVerticalStrut(30));
-        loginPanel.add(lblCuenta);
-        loginPanel.add(Box.createVerticalStrut(5));
-        loginPanel.add(txtNumeroCuenta);
-        loginPanel.add(Box.createVerticalStrut(15));
-        loginPanel.add(lblClave);
-        loginPanel.add(Box.createVerticalStrut(5));
-        loginPanel.add(txtClave);
-        loginPanel.add(Box.createVerticalStrut(25));
-        loginPanel.add(btnLogin);
-    }
+private void crearPanelLogin() {
+    loginPanel = new JPanel();
+    loginPanel.setLayout(new BoxLayout(loginPanel, BoxLayout.Y_AXIS));
+    loginPanel.setBorder(new EmptyBorder(30, 50, 30, 50));
+    loginPanel.setBackground(new Color(34, 40, 49)); // Fondo oscuro elegante
+
+    JLabel lblTitulo = new JLabel("Bienvenido al Cajero Automático");
+    lblTitulo.setFont(new Font("Arial", Font.BOLD, 20));
+    lblTitulo.setForeground(Color.WHITE);
+    lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+    JLabel lblCuenta = new JLabel("Número de Cuenta:");
+    lblCuenta.setFont(new Font("Arial", Font.PLAIN, 16));
+    lblCuenta.setForeground(new Color(200, 200, 200));
+    lblCuenta.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+    txtNumeroCuenta = new JTextField(10);
+    txtNumeroCuenta.setMaximumSize(new Dimension(220, 40));
+    txtNumeroCuenta.setFont(new Font("Arial", Font.PLAIN, 16));
+    txtNumeroCuenta.setHorizontalAlignment(JTextField.CENTER);
+    txtNumeroCuenta.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(0, 123, 255), 2, true), // Borde azul brillante
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+    ));
+
+    JLabel lblClave = new JLabel("Clave:");
+    lblClave.setFont(new Font("Arial", Font.PLAIN, 16));
+    lblClave.setForeground(new Color(200, 200, 200));
+    lblClave.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+    txtClave = new JPasswordField(10);
+    txtClave.setMaximumSize(new Dimension(220, 40));
+    txtClave.setFont(new Font("Arial", Font.PLAIN, 16));
+    txtClave.setHorizontalAlignment(JTextField.CENTER);
+    txtClave.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(0, 123, 255), 2, true), // Borde azul brillante
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+    ));
+
+    // Color para el botón
+    Color colorLogin = new Color(0, 123, 255); // Azul brillante
+    Color botonTexto = Color.WHITE;
+    Dimension buttonSize = new Dimension(220, 50);
+
+    btnLogin = crearBoton("Iniciar Sesión", colorLogin, botonTexto, buttonSize);
+
+    // Agregar componentes al panel
+    loginPanel.add(lblTitulo);
+    loginPanel.add(Box.createVerticalStrut(30));
+    loginPanel.add(lblCuenta);
+    loginPanel.add(Box.createVerticalStrut(10));
+    loginPanel.add(txtNumeroCuenta);
+    loginPanel.add(Box.createVerticalStrut(20));
+    loginPanel.add(lblClave);
+    loginPanel.add(Box.createVerticalStrut(10));
+    loginPanel.add(txtClave);
+    loginPanel.add(Box.createVerticalStrut(30));
+    loginPanel.add(btnLogin);
+}
+
     
 private void crearPanelMenu() {
     menuPanel = new JPanel();
@@ -429,6 +450,18 @@ private void crearPanelHistorial() {
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
+        
+    UIManager.put("OptionPane.background", new Color(34, 40, 49)); // Fondo oscuro
+    UIManager.put("Panel.background", new Color(34, 40, 49)); // Panel del mensaje
+    UIManager.put("OptionPane.messageForeground", Color.WHITE); // Texto en blanco
+    UIManager.put("Button.background", new Color(0, 123, 255)); // Azul para botones
+    UIManager.put("Button.foreground", Color.WHITE); // Texto blanco en botones
+    UIManager.put("Button.border", BorderFactory.createEmptyBorder(10, 15, 10, 15)); // Bordes más limpios
+    UIManager.put("Button.font", new Font("Arial", Font.BOLD, 14)); // Fuente más grande
+    UIManager.put("OptionPane.messageFont", new Font("Arial", Font.PLAIN, 16)); // Fuente del mensaje
+
+
+        
         
         // Manejo de eventos del panel de login
         if (source == btnLogin) {
